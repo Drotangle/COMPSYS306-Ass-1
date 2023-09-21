@@ -1,5 +1,8 @@
 # Ignore the actual dataset
 COMPSYS 306 - Assignment Part 1/Assignment-Dataset/
 
-# Ignore Intellij
-.idea/
+# Ignore Intellij - too IDE dependent
+COMPSYS 306 - Assignment Part 1/.idea/
+
+# Ignore venv/ file - too big
+COMPSYS 306 - Assignment Part 1/venv/
