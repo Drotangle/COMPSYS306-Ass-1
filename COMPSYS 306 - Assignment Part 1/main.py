@@ -2,8 +2,8 @@
 # and put it into a dataframe
 import pandas as pd
 
-autodataset = '/content/gdrive/MyDrive/CS306_2023/database/numerical/auto-mpg.csv'
-datafr = pd.read_csv(autodataset)
+dataDirectory = 'Assignment-Dataset/myData'
+dataframe = pd.read_csv(dataDirectory)
 
-print(datafr.shape)
-print(datafr.size)
+print(dataframe.shape)
+print(dataframe.size)
