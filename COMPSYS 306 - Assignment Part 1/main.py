@@ -1,16 +1,31 @@
 import pandas as pd
 import os
+import pickle
 from skimage.io import imread
 from skimage.transform import resize
 import numpy as np
+import datetime
 
-def readCategories():
+
+def print_time(started=True, seconds=False):
+    status = "Started"
+    if not started:
+        status = "Finished"
+
+    current_time = datetime.datetime.now().time()
+    if seconds:
+        print(f'{status} at: {current_time.hour % 12}:{current_time.minute}:{current_time.second}')
+    else:
+        print(f'{status} at: {current_time.hour % 12}:{current_time.minute}')
+
+
+def read_categories():
     labelsFile = "Assignment-Dataset/labels.csv"
     df = pd.read_csv(labelsFile)
     return df.to_numpy()
 
-def readInData():
 
+def read_in_data():
     # first have a look at the data
     # and put it into a dataframe
 
@@ -18,7 +33,7 @@ def readInData():
     flat_data_arr = []
     target_arr = []
 
-    categoryArray = readCategories()
+    categoryArray = read_categories()
 
     dataDirectory = 'Assignment-Dataset/myData'
 
@@ -42,9 +57,19 @@ def readInData():
     target = np.array(target_arr)
     df = pd.DataFrame(flat_data)
     df['Target'] = target
-    df
+    print(df.shape)
+    pickle.dump(df, open('data.pickle', 'wb'))
+
+
+def open_data():
+    return pickle.load(open('data.pickle', 'rb'))
+
+
+# only call if its the first time
+# read_in_data()
 
 # we should probably label the data as well after this
 # do we have to do anything to do the jpegs? - look at the extract py file
-readInData()
-
+print_time(True, True)
+df = open_data()
+print_time(started=False, seconds=True)
