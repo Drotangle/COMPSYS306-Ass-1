@@ -3,6 +3,7 @@ import os
 import pickle
 from skimage.io import imread
 from skimage.transform import resize
+from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import datetime
 
@@ -51,7 +52,7 @@ def read_in_data():
             img_array = imread(os.path.join(path, img))
             img_resized = resize(img_array, (32, 32, 3))
             flat_data_arr.append(img_resized.flatten())
-            target_arr.append(cat_name)
+            target_arr.append(i)
         print(f'loaded category : {cat_name} successfully')
     flat_data = np.array(flat_data_arr)
     target = np.array(target_arr)
@@ -65,11 +66,34 @@ def open_data():
     return pickle.load(open('data.pickle', 'rb'))
 
 
+def quick_analysis(dataframe):
+    print("\nData Analysis:")
+    print(f'shape: {dataframe.shape}')
+    print(f"first 10 :\n{dataframe.head(10)}")
+    offset = 70000
+    first_10_with_offset = dataframe.iloc[offset:offset + 10]
+    print(f"random 10 :\n{first_10_with_offset}")
+    print(f"")
+
+
+
 # only call if its the first time
 # read_in_data()
 
 # we should probably label the data as well after this
 # do we have to do anything to do the jpegs? - look at the extract py file
 print_time(True, True)
+
+# get data from file
 df = open_data()
+quick_analysis(df)
+
 print_time(started=False, seconds=True)
+print_time(True, True)
+
+# normalize the data
+# note this is causing computer to freeze for some reason??
+df.iloc[:, 0:3072] = MinMaxScaler().fit_transform(df.iloc[:, 0:3072])
+quick_analysis(df)
+
+print_time(False, True)
