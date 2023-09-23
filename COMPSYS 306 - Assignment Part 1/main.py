@@ -4,6 +4,7 @@ import pickle
 from skimage.io import imread
 from skimage.transform import resize
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 import datetime
 
@@ -93,7 +94,10 @@ print_time(True, True)
 
 # normalize the data
 # note this is causing computer to freeze for some reason??
-df.iloc[:, 0:3072] = MinMaxScaler().fit_transform(df.iloc[:, 0:3072])
-quick_analysis(df)
+df_n = df.copy()
+# does this even do anything???
+min_max_scaler = MinMaxScaler(feature_range=(0, 1))
+df_n.iloc[:, :-1] = min_max_scaler.fit_transform(df_n.iloc[:, :-1])
+quick_analysis(df_n)
 
 print_time(False, True)
