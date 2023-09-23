@@ -9,3 +9,5 @@ features?
 ranges!
 	- I'll do normalization as data does not follow standard distribution
 	- Actually, could do HOG (in topic notes) instead - might actually use along with it as feature extraction?
+	- is normalization implicitly done??? - this seems to be confirmed off of a link
+		- https://stackoverflow.com/questions/44257947/skimage-weird-results-of-resize-function
