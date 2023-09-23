@@ -1,3 +1,4 @@
+# note: to install more packages: do .\venv\Scripts\Activate first!
 import pandas as pd
 import os
 import pickle
@@ -85,15 +86,16 @@ def quick_analysis(dataframe):
 print_time(True, True)
 
 # get data from file
-df = open_data()
-quick_analysis(df)
+read_in_data()
+# df = open_data()
+# quick_analysis(df)
 
 print_time(started=False, seconds=True)
 print_time(True, True)
 
 # normalize the data
 # note this is causing computer to freeze for some reason??
-df.iloc[:, 0:3072] = MinMaxScaler().fit_transform(df.iloc[:, 0:3072])
-quick_analysis(df)
+# df.iloc[:, 0:3072] = MinMaxScaler().fit_transform(df.iloc[:, 0:3072])
+# quick_analysis(df)
 
 print_time(False, True)
