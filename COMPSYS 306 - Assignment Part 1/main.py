@@ -7,6 +7,7 @@ from skimage.transform import resize
 from sklearn.model_selection import train_test_split
 import numpy as np
 import datetime
+import joblib
 import matplotlib.pyplot as plt
 
 import mlp_model
@@ -26,11 +27,12 @@ def print_time(started=True, seconds=False):
 
 
 def plot_category_sizes(category_sizes):
-    bar_x_values = range(0,43)
+    bar_x_values = range(0, 43)
     plt.bar(bar_x_values, category_sizes)
     plt.xlabel("category #")
     plt.ylabel("category frequency")
     plt.show()
+
 
 def read_categories():
     labelsFile = "Assignment-Dataset/labels.csv"
@@ -38,7 +40,7 @@ def read_categories():
     return df.to_numpy()
 
 
-def read_in_data(save_to_file = True):
+def read_in_data(save_to_file=True):
     # first have a look at the data
     # and put it into a dataframe
 
@@ -76,7 +78,7 @@ def read_in_data(save_to_file = True):
             flat_data_arr.append(img_resized.flatten())
             target_arr.append(i)
             category_count += 1
-        
+
         category_sizes.append(category_count)
         print(f'loaded category : {cat_name} successfully')
 
@@ -106,12 +108,36 @@ def quick_analysis(dataframe):
     print(f"")
 
 
-def split_dataset(df, test_size):
+def split_dataset(df_split, valid_size, test_size, do_print=False, do_save_file=False):
+    x = df_split.drop(['Target'], axis=1).values
+    y = df_split['Target'].values
 
-    x = df.drop(['Target'], axis = 1).values
-    y = df['Target'].values
+    # note that the validate size is based off the size of the validate and training sets
+    x_train_val, x_testing_split, y_train_val, y_testing_split = train_test_split(x, y,
+                                                                                  test_size=test_size,
+                                                                                  random_state=1)
+    x_training_split, x_valid_split, y_training_split, y_valid_split = train_test_split(x_train_val, y_train_val,
+                                                                                        test_size=valid_size,
+                                                                                        random_state=1)
 
-    return train_test_split(x,y,test_size = test_size)
+    # print out if we want to see the shape of our datasets for training / testing / validation
+    if do_print:
+        print(np.shape(x_training_split))
+        print(np.shape(x_testing_split))
+        print(np.shape(x_valid_split))
+        print(np.shape(y_training_split))
+        print(np.shape(y_testing_split))
+        print(np.shape(y_valid_split))
+
+    if do_save_file:
+        joblib.dump(x_training_split, "x_training.pkl")
+        joblib.dump(x_testing_split, "x_testing.pkl")
+        joblib.dump(x_valid_split, "x_valid.pkl")
+        joblib.dump(y_training_split, "y_training.pkl")
+        joblib.dump(y_testing_split, "y_testing.pkl")
+        joblib.dump(y_valid_split, "y_valid.pkl")
+
+    return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
 
 # we should probably label the data as well after this
@@ -122,10 +148,16 @@ print_time(True, True)
 df, category_sizes = open_data()
 quick_analysis(df)
 
-print_time(started=False, seconds=True)
+print_time(False, True)
+print_time(True, True)
 
 # plot bar graph of size of each category
-plot_category_sizes(category_sizes)
+# plot_category_sizes(category_sizes)
 
-# split into training and testing datasets
-x_training,x_testing,y_training,y_testing = split_dataset(df, 0.2)
+# split into training and testing and validation datasets
+x_training, x_testing, x_valid, y_training, y_testing, y_valid = split_dataset(df, 0.2, 0.1, True, True)
+
+# try train the model
+# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 40)
+
+print_time(False, True)
