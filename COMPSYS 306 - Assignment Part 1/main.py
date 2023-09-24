@@ -140,24 +140,34 @@ def split_dataset(df_split, valid_size, test_size, do_print=False, do_save_file=
     return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
 
+def load_split_dataset():
+    x_training_split = joblib.load("x_training.pkl")
+    x_testing_split = joblib.load("x_testing.pkl")
+    x_valid_split = joblib.load("x_valid.pkl")
+    y_training_split = joblib.load("y_training.pkl")
+    y_testing_split = joblib.load("y_testing.pkl")
+    y_valid_split = joblib.load("y_valid.pkl")
+
+    return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
+
 # we should probably label the data as well after this
 # do we have to do anything to do the jpegs? - look at the extract py file
 print_time(True, True)
 
 # get data from file
-df, category_sizes = open_data()
-quick_analysis(df)
-
-print_time(False, True)
-print_time(True, True)
+# df, category_sizes = open_data()
+# quick_analysis(df)
 
 # plot bar graph of size of each category
 # plot_category_sizes(category_sizes)
 
 # split into training and testing and validation datasets
-x_training, x_testing, x_valid, y_training, y_testing, y_valid = split_dataset(df, 0.2, 0.1, True, True)
+# split_dataset(df, 0.2, 0.1, True, True)
+x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
 
 # try train the model
-# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 40)
+mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.1, 40)
+
+# svm_model.hog_test(x_training)
 
 print_time(False, True)
