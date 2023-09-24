@@ -13,7 +13,9 @@ ranges!
 	- is normalization implicitly done??? - this seems to be confirmed off of a link
 		- https://stackoverflow.com/questions/44257947/skimage-weird-results-of-resize-function
 - training and validation dataset - this seems to be where we split it up, we do some training then look at the validation dataset and tune hyperparameters as needed?
-	- testing only comes in at end for those other things like f1 score and stuff?
+	- testing only comes in at end for those other things like f1 score and stuff? - yep! validation is for tuning hyperparameters
+ - for mlp, looks like we need to define stuff in tensorflow but not actuall do it in tensorflow - this includes layers and activation functions!
+	- we can tune activation functions, but have a look at layer sizes!
 
 
 ## data analysis notes:
