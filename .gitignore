@@ -1,6 +1,10 @@
-# Ignore the actual dataset
+# Ignore the actual dataset and model info
 COMPSYS 306 - Assignment Part 1/Assignment-Dataset/
 COMPSYS 306 - Assignment Part 1/data.pickle
+COMPSYS 306 - Assignment Part 1/category_sizes.pickle
+COMPSYS 306 - Assignment Part 1/mlp_model.joblib
+COMPSYS 306 - Assignment Part 1/svm_model.joblib
+COMPSYS 306 - Assignment Part 1/__pycache__
 
 # Ignore Intellij - too IDE dependent
 COMPSYS 306 - Assignment Part 1/.idea/
