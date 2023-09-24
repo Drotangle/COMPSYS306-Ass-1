@@ -6,6 +6,7 @@ Part 1 of the assignment for COMPSYS 306 - AI and Machine Learning
 features?
 	- not sure what these would be other than just putting in the pixels
 	- i think this is just done with the MLP model?
+	- but if we are using SVM we might use HOG (histogram of ...)
 - normalization and standardization: we would likely need to do this as all images have different value
 ranges!
 	- I'll do normalization as data does not follow standard distribution
@@ -16,6 +17,7 @@ ranges!
 	- testing only comes in at end for those other things like f1 score and stuff? - yep! validation is for tuning hyperparameters
  - for mlp, looks like we need to define stuff in tensorflow but not actuall do it in tensorflow - this includes layers and activation functions!
 	- we can tune activation functions, but have a look at layer sizes!
+ 	- for the solver, we are using an optimized version of stochastic gradient descent, due to the size of my data
 
 
 ## data analysis notes:
