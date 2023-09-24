@@ -22,3 +22,7 @@ ranges!
 
 ## data analysis notes:
 - from the bar chart, the frequency of images in categories is very unbalanced
+
+## Things I may need to change:
+- if we are splitting data 3 ways, train, validate, test, wouldn't we keep it in this split as we tune model with train and validate then use test?
+- also note that my current accuracy with the model is 6.663% (this is low but randomly guessing signs is ~2.67%)
