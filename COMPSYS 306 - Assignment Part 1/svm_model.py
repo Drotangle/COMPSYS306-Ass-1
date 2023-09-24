@@ -29,21 +29,6 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     svc.fit(x_training, y_training)
 
 
-def canny_test(x_training):
-
-    # note that this may not work yet
-
-    image_flat = x_training[20000, :]
-    image = np.array(image_flat).reshape(32, 32, 3)
-
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Apply edge detection with adaptive threshold due to variance in lighting of images
-    # note the last parameter is a hyper-parameter
-    edges = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 8, 2)
-
-    cv2.imshow('Adaptive Thresholded Image', edges)
-
 def hog_test(x_training):
     # note: this below works!
     # x_big_set = x_training.reshape(52660, 32, 32, 3)
