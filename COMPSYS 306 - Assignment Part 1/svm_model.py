@@ -23,8 +23,7 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     hog_features_training = []
     hog_features_valid = []
 
-    # note the first value here are dependent on the splits
-    # also, this is just so we can get HOG from the training set
+    # apply hog on the data to get features
     x_training_not_flat = x_training.reshape(52660, 32, 32, 3)
     for image in x_training_not_flat:
         hog_features = hog(image, orientations=8, pixels_per_cell=(8, 8),
@@ -41,9 +40,11 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     print("(HOG finished)")
     show_time.print_time(True, True)
 
+    # train the model
     model = svm.SVC(kernel='rbf', gamma=0.7, C=3, max_iter=1400, probability=True)
     model.fit(hog_features_training, y_training)
 
+    # do validation on the current params
     y_pred = model.predict(hog_features_valid)
     accuracy = accuracy_score(y_valid, y_pred)
     precision = precision_score(y_valid, y_pred, average='micro')
@@ -75,7 +76,7 @@ def validation(x_testing, y_testing):
     print("(HOG finished)")
     show_time.print_time(True, True)
 
-    # test it
+    # test it by predicting
     y_pred = model.predict(hog_features_testing)
     accuracy = accuracy_score(y_testing, y_pred)
     precision = precision_score(y_testing, y_pred, average='macro')
@@ -92,6 +93,7 @@ def validation(x_testing, y_testing):
 def individual_test(x_testing, y_testing):
     model = load_svm_model()
 
+    # show the guess and actual for an image, to check if we are guessing correctly
     img_num = 1
 
     image_flat = x_testing[img_num, :]

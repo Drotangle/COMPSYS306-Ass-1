@@ -22,7 +22,7 @@ def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_r
     hog_features_valid = []
 
     # note the first value here are dependent on the splits
-    # also, this is just so we can get HOG from the training set
+    # also, this is just so we can get HOG from the training set and validation set
     x_training_not_flat = x_training.reshape(52660, 32, 32, 3)
     for image in x_training_not_flat:
         hog_features = hog(image, orientations=8, pixels_per_cell=(8, 8),
@@ -39,8 +39,7 @@ def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_r
     print("(HOG finished)")
     show_time.print_time(True, True)
 
-    # may want to make early stopping false (cos might have two validation sets?)
-    # first 2 layers are hidden, 3rd is output it seems (or not?)
+    # train the model on hog values
     model = MLPClassifier(hidden_layer_sizes=(144, 77), random_state=1, learning_rate_init=learning_rate,
                           max_iter=iterations, early_stopping=True, learning_rate='adaptive')
     model.fit(hog_features_training, y_training)
@@ -78,6 +77,7 @@ def validation(x_testing, y_testing):
     print("(HOG finished)")
     show_time.print_time(True, True)
 
+    # show validation results
     y_pred = model.predict(hog_features_testing)
     accuracy = accuracy_score(y_testing, y_pred)
     precision = precision_score(y_testing, y_pred, average='macro')

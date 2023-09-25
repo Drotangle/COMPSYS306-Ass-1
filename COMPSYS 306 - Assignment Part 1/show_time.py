@@ -2,6 +2,9 @@ import datetime
 
 
 def print_time(started=True, seconds=False):
+
+    # display a message showing the current clock time, with seconds if it might not take that long
+
     status = "Started"
     if not started:
         status = "Finished"

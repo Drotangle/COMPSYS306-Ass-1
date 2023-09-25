@@ -15,6 +15,7 @@ import show_time
 
 
 def plot_category_sizes(category_sizes):
+    # plots the size of each category for data analysis
     bar_x_values = range(0, 43)
     plt.bar(bar_x_values, category_sizes)
     plt.xlabel("category #")
@@ -23,6 +24,7 @@ def plot_category_sizes(category_sizes):
 
 
 def read_categories():
+    # reads all the categories to an array for analysis
     labelsFile = "Assignment-Dataset/labels.csv"
     df = pd.read_csv(labelsFile)
     return df.to_numpy()
@@ -42,6 +44,7 @@ def read_in_data(save_to_file=True):
 
     categoryArray = read_categories()
 
+    # data will be found in this directory (is the renamed unzipped folder from kaggle - must be added in)
     dataDirectory = 'Assignment-Dataset/myData'
 
     # add in all files
@@ -55,6 +58,7 @@ def read_in_data(save_to_file=True):
         # initialize count of images in a category
         category_count = 0
 
+        # display what category is being loaded for debugging
         print(f'loading... category ({i}/42) :\t{cat_name}')
         path = os.path.join(dataDirectory, str(i))
 
@@ -67,9 +71,11 @@ def read_in_data(save_to_file=True):
             target_arr.append(i)
             category_count += 1
 
+        # create the category count list as we load in the dataset
         category_sizes.append(category_count)
-        print(f'loaded category : {cat_name} successfully')
+        print(f'finished loaded category : {cat_name}')
 
+    # finish up the dataframe, adding the labels to the data as well
     flat_data = np.array(flat_data_arr)
     target = np.array(target_arr)
     df = pd.DataFrame(flat_data)
@@ -87,6 +93,7 @@ def open_data():
 
 
 def quick_analysis(dataframe):
+    # give a quick analysis of the data, to make sure we understand how it looks, and how big each image array is
     print("\nData Analysis:")
     print(f'shape: {dataframe.shape}')
     print(f"first 10 :\n{dataframe.head(10)}")
@@ -97,10 +104,11 @@ def quick_analysis(dataframe):
 
 
 def split_dataset(df_split, valid_size, test_size, do_print=False, do_save_file=False):
+    # separate into values and labels
     x = df_split.drop(['Target'], axis=1).values
     y = df_split['Target'].values
 
-    # note that the validate size is based off the size of the validate and training sets
+    # split into training, testing and validation
     x_train_val, x_testing_split, y_train_val, y_testing_split = train_test_split(x, y,
                                                                                   test_size=test_size,
                                                                                   random_state=1)
@@ -117,6 +125,7 @@ def split_dataset(df_split, valid_size, test_size, do_print=False, do_save_file=
         print(np.shape(y_testing_split))
         print(np.shape(y_valid_split))
 
+    # save to file if we want
     if do_save_file:
         joblib.dump(x_training_split, "x_training.joblib")
         joblib.dump(x_testing_split, "x_testing.joblib")
@@ -139,8 +148,7 @@ def load_split_dataset():
     return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
 
-# we should probably label the data as well after this
-# do we have to do anything to do the jpegs? - look at the extract py file
+# show the time taken for debugging purposes
 show_time.print_time(True, True)
 
 # get full dataset from file
