@@ -144,11 +144,11 @@ def load_split_dataset():
 show_time.print_time(True, True)
 
 # get data from file
-df, category_sizes = open_data()
+# df, category_sizes = open_data()
 # quick_analysis(df)
 
 # look for median of bar graph
-median = sorted(category_sizes)[21]
+'''median = sorted(category_sizes)[21]
 new_category_sizes = []
 print(median)
 for value in category_sizes:
@@ -161,14 +161,14 @@ for value in category_sizes:
         new_category_sizes.append(value)
 
 # plot bar graph of size of each category
-plot_category_sizes(new_category_sizes)
+plot_category_sizes(new_category_sizes)'''
 
 # split into training and testing and validation datasets
 # split_dataset(df, 0.2, 0.1, True, True)
-# x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
+x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
 
 # try train the model
-# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.1, 120, True)
+mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 2500, True)
 # svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
 
 # svm_model.hog_test(x_training)
