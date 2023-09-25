@@ -1,6 +1,8 @@
 import joblib
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import precision_score, accuracy_score
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 
 def save_mlp_model(model):
@@ -12,9 +14,10 @@ def load_mlp_model():
 
 
 def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_rate, iterations, save_model=False):
+
     # may want to make early stopping false (cos might have two validation sets?)
-    model = MLPClassifier(hidden_layer_sizes=(3072, 1028, 256, 43), random_state=1, learning_rate_init=learning_rate,
-                          max_iter=iterations, early_stopping=True)
+    model = MLPClassifier(hidden_layer_sizes=(3072, 512, 256, 43), random_state=1, learning_rate_init=learning_rate,
+                          max_iter=iterations)
     model.fit(x_training, y_training)
 
     # now validate it

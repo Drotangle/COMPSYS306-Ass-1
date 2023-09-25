@@ -1,4 +1,3 @@
-# note: to install more packages: do .\venv\Scripts\Activate first!
 import pandas as pd
 import os
 import pickle
@@ -12,18 +11,7 @@ import matplotlib.pyplot as plt
 
 import mlp_model
 import svm_model
-
-
-def print_time(started=True, seconds=False):
-    status = "Started"
-    if not started:
-        status = "Finished"
-
-    current_time = datetime.datetime.now().time()
-    if seconds:
-        print(f'{status} at: {current_time.hour % 12}:{current_time.minute}:{current_time.second}')
-    else:
-        print(f'{status} at: {current_time.hour % 12}:{current_time.minute}')
+import show_time
 
 
 def plot_category_sizes(category_sizes):
@@ -150,9 +138,10 @@ def load_split_dataset():
 
     return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
+
 # we should probably label the data as well after this
 # do we have to do anything to do the jpegs? - look at the extract py file
-print_time(True, True)
+show_time.print_time(True, True)
 
 # get data from file
 # df, category_sizes = open_data()
@@ -166,8 +155,12 @@ print_time(True, True)
 x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
 
 # try train the model
-mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.1, 40)
+# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.4, 40)
+# svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
 
 # svm_model.hog_test(x_training)
 
-print_time(False, True)
+# now that we have correct hyperparameters, using testing dataset
+svm_model.individual_test(x_testing, y_testing)
+
+show_time.print_time(False, True)
