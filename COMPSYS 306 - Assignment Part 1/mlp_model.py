@@ -9,11 +9,11 @@ import show_time
 
 
 def save_mlp_model(model):
-    joblib.dump(model, 'mlp_model.pkl')
+    joblib.dump(model, 'mlp_model.joblib')
 
 
 def load_mlp_model():
-    return joblib.load('mlp_model.pkl')
+    return joblib.load('mlp_model.joblib')
 
 
 def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_rate, iterations, save_model=False):

@@ -118,23 +118,23 @@ def split_dataset(df_split, valid_size, test_size, do_print=False, do_save_file=
         print(np.shape(y_valid_split))
 
     if do_save_file:
-        joblib.dump(x_training_split, "x_training.pkl")
-        joblib.dump(x_testing_split, "x_testing.pkl")
-        joblib.dump(x_valid_split, "x_valid.pkl")
-        joblib.dump(y_training_split, "y_training.pkl")
-        joblib.dump(y_testing_split, "y_testing.pkl")
-        joblib.dump(y_valid_split, "y_valid.pkl")
+        joblib.dump(x_training_split, "x_training.joblib")
+        joblib.dump(x_testing_split, "x_testing.joblib")
+        joblib.dump(x_valid_split, "x_valid.joblib")
+        joblib.dump(y_training_split, "y_training.joblib")
+        joblib.dump(y_testing_split, "y_testing.joblib")
+        joblib.dump(y_valid_split, "y_valid.joblib")
 
     return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
 
 def load_split_dataset():
-    x_training_split = joblib.load("x_training.pkl")
-    x_testing_split = joblib.load("x_testing.pkl")
-    x_valid_split = joblib.load("x_valid.pkl")
-    y_training_split = joblib.load("y_training.pkl")
-    y_testing_split = joblib.load("y_testing.pkl")
-    y_valid_split = joblib.load("y_valid.pkl")
+    x_training_split = joblib.load("x_training.joblib")
+    x_testing_split = joblib.load("x_testing.joblib")
+    x_valid_split = joblib.load("x_valid.joblib")
+    y_training_split = joblib.load("y_training.joblib")
+    y_testing_split = joblib.load("y_testing.joblib")
+    y_valid_split = joblib.load("y_valid.joblib")
 
     return x_training_split, x_testing_split, x_valid_split, y_training_split, y_testing_split, y_valid_split
 
@@ -143,38 +143,23 @@ def load_split_dataset():
 # do we have to do anything to do the jpegs? - look at the extract py file
 show_time.print_time(True, True)
 
-# get data from file
+# get full dataset from file
 # df, category_sizes = open_data()
 # quick_analysis(df)
 
-# look for median of bar graph
-'''median = sorted(category_sizes)[21]
-new_category_sizes = []
-print(median)
-for value in category_sizes:
-    if value < median:
-        new_category_sizes.append(value)
-    elif value > median:
-        # maybe we could just third these categories and that's it?
-        new_category_sizes.append(value / 4)
-    else:
-        new_category_sizes.append(value)
-
 # plot bar graph of size of each category
-plot_category_sizes(new_category_sizes)'''
+# plot_category_sizes(category_sizes)
 
-# split into training and testing and validation datasets
+# split into training and testing and validation datasets, saving to file as well
 # split_dataset(df, 0.2, 0.1, True, True)
 x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
 
-# try train the model
-mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 2500, True)
-# svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
+# try train the models
+# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 2500, True)
+svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
 
-# svm_model.hog_test(x_training)
-
-# now that we have correct hyperparameters, using testing dataset
-# svm_model.individual_test(x_testing, y_testing)
+# now that we have correct hyper-parameters, use testing dataset to check model
+svm_model.individual_test(x_testing, y_testing)
 # mlp_model.validation(x_testing, y_testing)
 
 show_time.print_time(False, True)
