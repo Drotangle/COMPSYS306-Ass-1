@@ -1,7 +1,7 @@
 import joblib
 from skimage.feature import hog
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import precision_score, accuracy_score, classification_report
+from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, classification_report, confusion_matrix
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 
@@ -48,7 +48,7 @@ def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_r
     # now validate it
     y_pred = model.predict(hog_features_valid)
     accuracy = accuracy_score(y_valid, y_pred)
-    precision = precision_score(y_valid, y_pred, average='macro')
+    precision = precision_score(y_valid, y_pred, average='micro')
     print(f"Accuracy Score: {accuracy * 100}%")
     print(f"Precision Score: {precision * 100}%")
     print(classification_report(y_true=y_valid, y_pred=y_pred))
@@ -59,6 +59,8 @@ def fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, learning_r
 
 
 def validation(x_testing, y_testing):
+
+    print("\nMLP testing info:\n")
 
     # check model based off of testing params
     model = load_mlp_model()
@@ -77,4 +79,13 @@ def validation(x_testing, y_testing):
     show_time.print_time(True, True)
 
     y_pred = model.predict(hog_features_testing)
+    accuracy = accuracy_score(y_testing, y_pred)
+    precision = precision_score(y_testing, y_pred, average='macro')
+    recall = recall_score(y_testing, y_pred, average='macro')
+    score = f1_score(y_true=y_testing, y_pred=y_pred, average="macro")
+    print(f"Accuracy Score: {accuracy * 100}%")
+    print(f"Precision Score: {precision * 100}%")
+    print(f"Recall Score: {recall * 100}%")
+    print(f"F1 Score: {score * 100}%")
     print(classification_report(y_true=y_testing, y_pred=y_pred))
+    print(confusion_matrix(y_testing, y_pred))
