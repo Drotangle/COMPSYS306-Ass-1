@@ -144,23 +144,37 @@ def load_split_dataset():
 show_time.print_time(True, True)
 
 # get data from file
-# df, category_sizes = open_data()
+df, category_sizes = open_data()
 # quick_analysis(df)
 
+# look for median of bar graph
+median = sorted(category_sizes)[21]
+new_category_sizes = []
+print(median)
+for value in category_sizes:
+    if value < median:
+        new_category_sizes.append(value)
+    elif value > median:
+        # maybe we could just third these categories and that's it?
+        new_category_sizes.append(value / 4)
+    else:
+        new_category_sizes.append(value)
+
 # plot bar graph of size of each category
-# plot_category_sizes(category_sizes)
+plot_category_sizes(new_category_sizes)
 
 # split into training and testing and validation datasets
 # split_dataset(df, 0.2, 0.1, True, True)
-x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
+# x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_dataset()
 
 # try train the model
-# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.4, 40)
+# mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.1, 120, True)
 # svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
 
 # svm_model.hog_test(x_training)
 
 # now that we have correct hyperparameters, using testing dataset
-svm_model.individual_test(x_testing, y_testing)
+# svm_model.individual_test(x_testing, y_testing)
+# mlp_model.validation(x_testing, y_testing)
 
 show_time.print_time(False, True)

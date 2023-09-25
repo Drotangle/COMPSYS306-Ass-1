@@ -80,12 +80,12 @@ def validation(x_testing, y_testing):
     y_pred = model.predict(hog_features_testing)
     accuracy = accuracy_score(y_testing, y_pred)
     precision = precision_score(y_testing, y_pred, average='macro')
-    score = f1_score(y_testing, y_pred, average="macro")
+    score = f1_score(y_true=y_testing, y_pred=y_pred, average="macro")
     print(f"Accuracy Score: {accuracy * 100}%")
     print(f"Precision Score: {precision * 100}%")
     print(f"F1 Score: {score * 100}%")
 
-    print(classification_report(y_pred, y_testing))
+    print(classification_report(y_true=y_testing, y_pred=y_pred))
 
 
 def individual_test(x_testing, y_testing):
@@ -104,6 +104,7 @@ def individual_test(x_testing, y_testing):
 
 
 def hog_test(x_training):
+    # COPIED CODE ALERT - DELETE MONSOIR
     # note: this below works!
     # x_big_set = x_training.reshape(52660, 32, 32, 3)
     # image_flat = x_big_set[30000]
@@ -128,5 +129,3 @@ def hog_test(x_training):
     ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
     ax2.set_title('Histogram of Oriented Gradients')
     plt.show()
-
-# maybe see how much SIFT takes to do and try it?
