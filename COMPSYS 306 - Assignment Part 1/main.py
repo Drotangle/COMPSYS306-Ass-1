@@ -182,7 +182,7 @@ show_time.print_time(True, True)
 # now that we have correct hyper-parameters, use testing dataset to check model
 # svm_model.validation(x_testing, y_testing)
 # svm_model.individual_test(x_testing, y_testing)
-svm_model.visual_all_test(x_testing, y_testing)
+# svm_model.visual_all_test(x_testing, y_testing)
 # mlp_model.validation(x_testing, y_testing)
 
 show_time.print_time(False, True)
