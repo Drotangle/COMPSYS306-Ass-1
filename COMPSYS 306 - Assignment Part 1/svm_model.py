@@ -5,6 +5,7 @@ from skimage.feature import hog
 from skimage import exposure
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, accuracy_score, f1_score, recall_score, classification_report, confusion_matrix
+from sklearn.model_selection import GridSearchCV
 import cv2
 
 import show_time
@@ -43,8 +44,24 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     print("(HOG finished)")
     show_time.print_time(True, True)
 
+    param_grid = {
+    'C': [0.1, 0.5, 1, 3, 5, 7, 10],
+    'kernel': ['linear', 'rbf', 'poly'],
+    'gamma': [0.0001, 0.01, 0.1, 0.7, 1, 10],
+    'max_iter': [1400, 2000, 10000, 100000000]
+    }
+
+    # from the param grid, my best hyperparams are C:0.1, gamma:1, kernel:poly, max_iter:1400
+
+    #my_svc = svm.SVC()
+
+    #gridsearch = GridSearchCV(estimator=my_svc, param_grid=param_grid, cv=5)
+    #gridsearch.fit(hog_features_training, y_training)
+    #print(gridsearch.best_params_)
+    #model = gridsearch.best_estimator_
+
     # train the model
-    model = svm.SVC(kernel='rbf', gamma=0.7, C=3, max_iter=1400, probability=True)
+    model = svm.SVC(kernel='poly', gamma=1, C=0.1, max_iter=1400, probability=True)
     model.fit(hog_features_training, y_training)
 
     # do validation on the current params
@@ -55,6 +72,7 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     print(f"Accuracy Score: {accuracy * 100}%")
     print(f"Precision Score: {precision * 100}%")
     print(f"F1 Score: {score * 100}%")
+    print(confusion_matrix(y_valid, y_pred))
 
     if save_model:
         save_svm_model(model)
