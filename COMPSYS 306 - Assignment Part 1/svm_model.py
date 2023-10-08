@@ -14,6 +14,7 @@ ORIENTATIONS = 8
 PIXELS_PER_CELL = 8
 CELLS_PER_BLOCK = 2
 
+# don't change either of these
 IMAGE_SIZE = 32
 COLOR_PARTITIONS = 8
 
@@ -41,17 +42,18 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
         hog_features_training.append(hog_features)
 
+        # note that we are removing the borders of the pic (so its the center 24x24)
         # add the color_feature
-        color_features = np.zeros((COLOR_PARTITIONS,COLOR_PARTITIONS,3))
+        color_features = np.zeros((COLOR_PARTITIONS-2,COLOR_PARTITIONS-2,3))
 
         # try add those color params
-        for i in range(0,COLOR_PARTITIONS):
-            for j in range(0,COLOR_PARTITIONS):
+        for i in range(0+1,COLOR_PARTITIONS-1):
+            for j in range(0+1,COLOR_PARTITIONS-1):
                 
                 # find the mean color over this 4x4 pixel region
-                color_features[i,j,0] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 0])
-                color_features[i,j,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
-                color_features[i,j,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
+                color_features[i-1,j-1,0] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 0])
+                color_features[i-1,j-1,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
+                color_features[i-1,j-1,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
 
         color_features_training.append(color_features)
 
