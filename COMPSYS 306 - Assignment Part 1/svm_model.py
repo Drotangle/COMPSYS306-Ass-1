@@ -17,6 +17,7 @@ CELLS_PER_BLOCK = 2
 # don't change either of these
 IMAGE_SIZE = 32
 COLOR_PARTITIONS = 8
+PARTITION_SIZE = IMAGE_SIZE // COLOR_PARTITIONS
 
 def save_svm_model(model):
     joblib.dump(model, 'svm_model.joblib')
@@ -26,14 +27,25 @@ def load_svm_model():
     return joblib.load('svm_model.joblib')
 
 
+def plot_testing_image(image, color_features):
+    plt.figure(figsize=(8, 4))
+    plt.subplot(1, 2, 1)
+    plt.imshow(image, cmap='gray')
+    plt.title('Image 1')
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(color_features, cmap='gray')
+    plt.title('Image 2')
+
+    plt.show()
+
+
 def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model=False):
     # we only use hog cos some colors are really off, might not be useful
     hog_features_training = []
     hog_features_valid = []
     color_features_training = []
     color_features_valid = []
-
-    PARTITION_SIZE = IMAGE_SIZE // COLOR_PARTITIONS
 
     # apply hog on the data to get features
     x_training_not_flat = x_training.reshape(786, 32, 32, 3)
@@ -55,25 +67,42 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
                 color_features[i-1,j-1,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
                 color_features[i-1,j-1,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
 
-        color_features_training.append(color_features)
+        # make sure to normalize it
+        color_features_norm = (color_features - color_features.min()) / (color_features.max() - color_features.min())
+        color_features_training.append(color_features_norm)
 
-        # TODO: remove cos this is for testing
-        plt.figure(figsize=(8, 4))  # Adjust the figure size as needed
-        plt.subplot(1, 2, 1)  # 1 row, 2 columns, first subplot
-        plt.imshow(image, cmap='gray')  # Display the first image
-        plt.title('Image 1')
+        # only uncomment if we want to:
+        # plot_testing_image(image, color_features)
 
-        plt.subplot(1, 2, 2)  # 1 row, 2 columns, second subplot
-        plt.imshow(color_features, cmap='gray')  # Display the second image
-        plt.title('Image 2')
-
-        plt.show()  # Display the plot
+    color_features_training_flat = np.array(color_features_training).reshape(786, 108)
 
     x_valid_not_flat = x_valid.reshape(197, 32, 32, 3)
     for image in x_valid_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
         hog_features_valid.append(hog_features)
+
+        # note that we are removing the borders of the pic (so its the center 24x24)
+        # add the color_feature
+        color_features = np.zeros((COLOR_PARTITIONS-2,COLOR_PARTITIONS-2,3))
+
+        # try add those color params
+        for i in range(0+1,COLOR_PARTITIONS-1):
+            for j in range(0+1,COLOR_PARTITIONS-1):
+                
+                # find the mean color over this 4x4 pixel region
+                color_features[i-1,j-1,0] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 0])
+                color_features[i-1,j-1,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
+                color_features[i-1,j-1,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
+
+        # make sure to normalize it
+        color_features_norm = (color_features - color_features.min()) / (color_features.max() - color_features.min())
+        color_features_valid.append(color_features_norm)
+
+        # only uncomment if we want to:
+        # plot_testing_image(image, color_features)
+
+    color_features_valid_flat = np.array(color_features_valid).reshape(197, 108)
 
     show_time.print_time(False, True)
     print("(HOG finished)")
@@ -91,16 +120,16 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     #my_svc = svm.SVC()
 
     #gridsearch = GridSearchCV(estimator=my_svc, param_grid=param_grid, cv=5)
-    #gridsearch.fit(hog_features_training, y_training)
+    #gridsearch.fit(np.concatenate((hog_features_training, color_features_training_flat), axis=1), y_training)
     #print(gridsearch.best_params_)
     #model = gridsearch.best_estimator_
 
     # train the model
     model = svm.SVC(kernel='poly', gamma=1, C=0.1, max_iter=1400, probability=True)
-    model.fit(hog_features_training, y_training)
+    model.fit(np.concatenate((hog_features_training, color_features_training_flat), axis=1), y_training)
 
     # do validation on the current params
-    y_pred = model.predict(hog_features_valid)
+    y_pred = model.predict(np.concatenate((hog_features_valid, color_features_valid_flat), axis=1))
     accuracy = accuracy_score(y_valid, y_pred)
     precision = precision_score(y_valid, y_pred, average='micro')
     score = f1_score(y_valid, y_pred, average="micro")
@@ -121,6 +150,7 @@ def validation(x_testing, y_testing):
 
     # hog the model
     hog_features_testing = []
+    color_features_testing = []
 
     x_testing_not_flat = x_testing.reshape(246, 32, 32, 3)
     for image in x_testing_not_flat:
@@ -128,12 +158,31 @@ def validation(x_testing, y_testing):
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
         hog_features_testing.append(hog_features)
 
+        # note that we are removing the borders of the pic (so its the center 24x24)
+        # add the color_feature
+        color_features = np.zeros((COLOR_PARTITIONS-2,COLOR_PARTITIONS-2,3))
+
+        # try add those color params
+        for i in range(0+1,COLOR_PARTITIONS-1):
+            for j in range(0+1,COLOR_PARTITIONS-1):
+                
+                # find the mean color over this 4x4 pixel region
+                color_features[i-1,j-1,0] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 0])
+                color_features[i-1,j-1,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
+                color_features[i-1,j-1,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
+
+        # make sure to normalize it
+        color_features_norm = (color_features - color_features.min()) / (color_features.max() - color_features.min())
+        color_features_testing.append(color_features_norm)
+
+    color_features_testing_flat = np.array(color_features_testing).reshape(246, 108)
+
     show_time.print_time(False, True)
     print("(HOG finished)")
     show_time.print_time(True, True)
 
     # test it by predicting
-    y_pred = model.predict(hog_features_testing)
+    y_pred = model.predict(np.concatenate((hog_features_testing, color_features_testing_flat), axis=1))
     accuracy = accuracy_score(y_testing, y_pred)
     precision = precision_score(y_testing, y_pred, average='macro')
     recall = recall_score(y_testing, y_pred, average='macro')

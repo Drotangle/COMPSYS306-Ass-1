@@ -176,7 +176,6 @@ x_training, x_testing, x_valid, y_training, y_testing, y_valid = load_split_data
 # try train the models
 # mlp_model.fit_and_train_mlp_model(x_training, x_valid, y_training, y_valid, 0.01, 2500, True)
 svm_model.fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, True)
-
 # show_time.print_time(True, True)
 
 # now that we have correct hyper-parameters, use testing dataset to check model
