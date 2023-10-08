@@ -27,13 +27,13 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     hog_features_valid = []
 
     # apply hog on the data to get features
-    x_training_not_flat = x_training.reshape(176, 32, 32, 3)
+    x_training_not_flat = x_training.reshape(786, 32, 32, 3)
     for image in x_training_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
         hog_features_training.append(hog_features)
 
-    x_valid_not_flat = x_valid.reshape(45, 32, 32, 3)
+    x_valid_not_flat = x_valid.reshape(197, 32, 32, 3)
     for image in x_valid_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
@@ -69,7 +69,7 @@ def validation(x_testing, y_testing):
     # hog the model
     hog_features_testing = []
 
-    x_testing_not_flat = x_testing.reshape(56, 32, 32, 3)
+    x_testing_not_flat = x_testing.reshape(246, 32, 32, 3)
     for image in x_testing_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
@@ -97,24 +97,24 @@ def individual_test(x_testing, y_testing):
     model = load_svm_model()
 
     # show the guess and actual for an image, to check if we are guessing correctly
-    img_num = 55
 
-    image_flat = x_testing[img_num, :]
-    image = np.array(image_flat).reshape(32, 32, 3)
-    hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                       cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+    for img_num in range(0,240):
+        image_flat = x_testing[img_num, :]
+        image = np.array(image_flat).reshape(32, 32, 3)
+        hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
+                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
 
-    print(f"prediction: {model.predict(np.array(hog_features).reshape(1,-1))[0]}")
-    print(f"actual: {y_testing[img_num]}")
+        print(f"prediction: {model.predict(np.array(hog_features).reshape(1,-1))[0]}")
+        print(f"actual: {y_testing[img_num]}")
 
-    plt.imshow(image)
-    plt.show()
+        plt.imshow(image)
+        plt.show()
 
 
 def visual_all_test(x_testing, y_testing):
     model = load_svm_model()
 
-    images = np.array(x_testing).reshape(56,32,32,3)
+    images = np.array(x_testing).reshape(246,32,32,3)
 
     # Define the number of rows and columns for subplots
     num_rows, num_cols = 7, 8  # Assuming you want 7 rows and 8 columns of images
