@@ -125,7 +125,7 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     #model = gridsearch.best_estimator_
 
     # train the model
-    model = svm.SVC(kernel='poly', gamma=1, C=0.1, max_iter=1400, probability=True)
+    model = svm.SVC(kernel='rbf', gamma=0.1, C=1, max_iter=1400, probability=True)
     model.fit(np.concatenate((hog_features_training, color_features_training_flat), axis=1), y_training)
 
     # do validation on the current params
@@ -205,8 +205,26 @@ def individual_test(x_testing, y_testing):
         image = np.array(image_flat).reshape(32, 32, 3)
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
                            cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+        
+        # note that we are removing the borders of the pic (so its the center 24x24)
+        # add the color_feature
+        color_features = np.zeros((COLOR_PARTITIONS-2,COLOR_PARTITIONS-2,3))
 
-        print(f"prediction: {model.predict(np.array(hog_features).reshape(1,-1))[0]}")
+        # try add those color params
+        for i in range(0+1,COLOR_PARTITIONS-1):
+            for j in range(0+1,COLOR_PARTITIONS-1):
+                
+                # find the mean color over this 4x4 pixel region
+                color_features[i-1,j-1,0] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 0])
+                color_features[i-1,j-1,1] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 1])
+                color_features[i-1,j-1,2] = np.mean(image[i*PARTITION_SIZE:(i+1)*PARTITION_SIZE, j*PARTITION_SIZE:(j+1)*PARTITION_SIZE, 2])
+
+        # make sure to normalize it
+        color_features_norm = (color_features - color_features.min()) / (color_features.max() - color_features.min())
+
+        feature_vector = np.concatenate((hog_features, color_features_norm.reshape(-1)), axis=0).reshape(1, -1)
+
+        print(f"prediction: {model.predict(feature_vector)[0]}")
         print(f"actual: {y_testing[img_num]}")
 
         plt.imshow(image)
