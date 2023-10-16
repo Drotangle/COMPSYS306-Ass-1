@@ -1,5 +1,7 @@
 # Ignore the actual dataset and model info
 COMPSYS 306 - Assignment Part 1/Assignment-Dataset/
+COMPSYS 306 - Assignment Part 1/Assignment-Dataset-Alt/
+COMPSYS 306 - Assignment Part 1/Combined-Dataset/
 COMPSYS 306 - Assignment Part 1/*.pickle
 COMPSYS 306 - Assignment Part 1/__pycache__
 COMPSYS 306 - Assignment Part 1/*.joblib

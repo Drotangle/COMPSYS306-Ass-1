@@ -25,7 +25,7 @@ def plot_category_sizes(category_sizes):
 
 def read_categories():
     # reads all the categories to an array for analysis
-    labelsFile = "Assignment-Dataset/labels.csv"
+    labelsFile = "Combined-Dataset/labels.csv"
     df = pd.read_csv(labelsFile)
     return df.to_numpy()
 
@@ -45,18 +45,20 @@ def read_in_data(save_to_file=True, read_labels=True, num_categories=43):
         categoryArray = read_categories()
 
     # data will be found in this directory (is the renamed unzipped folder from kaggle - must be added in)
-    dataDirectory = 'Assignment-Dataset/myData'
+    dataDirectory = 'Combined-Dataset/myData'
 
     # add in all files
+    #categories = ['road','stop','speed','yellow','red','green']
+    categories = ['stop','speed','yellow','red','green']
     Category_numbers = range(0, num_categories)
 
-    for i in Category_numbers:
+    for i in categories:
 
         if read_labels:
             # change it to category name
             cat_name = categoryArray[i][1]
         else:
-            cat_name = str(i);
+            cat_name = str(i)
 
         if read_labels:
             # initialize count of images in a category
@@ -163,7 +165,7 @@ show_time.print_time(True, True)
 
 # get full dataset from file
 # read_in_data(read_labels=False, num_categories=6)
-df = open_data(read_labels=False)
+# df = open_data(read_labels=False)
 # quick_analysis(df)
 
 # plot bar graph of size of each category

@@ -1,12 +1,13 @@
 import joblib
 from sklearn import svm
+from sklearn.calibration import CalibratedClassifierCV
 import numpy as np
 from skimage.feature import hog
 from skimage import exposure
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, accuracy_score, f1_score, recall_score, classification_report, confusion_matrix
 from sklearn.model_selection import GridSearchCV
-import cv2
+# import cv2
 
 import show_time
 
@@ -48,10 +49,10 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     color_features_valid = []
 
     # apply hog on the data to get features
-    x_training_not_flat = x_training.reshape(786, 32, 32, 3)
+    x_training_not_flat = x_training.reshape(2068, 32, 32, 3)
     for image in x_training_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK))
         hog_features_training.append(hog_features)
 
         # note that we are removing the borders of the pic (so its the center 24x24)
@@ -74,12 +75,12 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
         # only uncomment if we want to:
         # plot_testing_image(image, color_features)
 
-    color_features_training_flat = np.array(color_features_training).reshape(786, 108)
+    color_features_training_flat = np.array(color_features_training).reshape(2068, 108)
 
-    x_valid_not_flat = x_valid.reshape(197, 32, 32, 3)
+    x_valid_not_flat = x_valid.reshape(517, 32, 32, 3)
     for image in x_valid_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK))
         hog_features_valid.append(hog_features)
 
         # note that we are removing the borders of the pic (so its the center 24x24)
@@ -102,7 +103,7 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
         # only uncomment if we want to:
         # plot_testing_image(image, color_features)
 
-    color_features_valid_flat = np.array(color_features_valid).reshape(197, 108)
+    color_features_valid_flat = np.array(color_features_valid).reshape(517, 108)
 
     show_time.print_time(False, True)
     print("(HOG finished)")
@@ -125,7 +126,11 @@ def fit_and_train_svm_model(x_training, x_valid, y_training, y_valid, save_model
     #model = gridsearch.best_estimator_
 
     # train the model
-    model = svm.SVC(kernel='rbf', gamma=0.1, C=1, max_iter=1400, probability=True)
+    unwrapped_model = svm.SVC(kernel='rbf', gamma=0.1, C=1, max_iter=1400, probability=True)
+    unwrapped_model.fit(np.concatenate((hog_features_training, color_features_training_flat), axis=1), y_training)
+
+    # try wrapping to use softmax
+    model = CalibratedClassifierCV(unwrapped_model, method='sigmoid', cv='prefit')
     model.fit(np.concatenate((hog_features_training, color_features_training_flat), axis=1), y_training)
 
     # do validation on the current params
@@ -152,10 +157,10 @@ def validation(x_testing, y_testing):
     hog_features_testing = []
     color_features_testing = []
 
-    x_testing_not_flat = x_testing.reshape(246, 32, 32, 3)
+    x_testing_not_flat = x_testing.reshape(647, 32, 32, 3)
     for image in x_testing_not_flat:
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK))
         hog_features_testing.append(hog_features)
 
         # note that we are removing the borders of the pic (so its the center 24x24)
@@ -175,7 +180,7 @@ def validation(x_testing, y_testing):
         color_features_norm = (color_features - color_features.min()) / (color_features.max() - color_features.min())
         color_features_testing.append(color_features_norm)
 
-    color_features_testing_flat = np.array(color_features_testing).reshape(246, 108)
+    color_features_testing_flat = np.array(color_features_testing).reshape(647, 108)
 
     show_time.print_time(False, True)
     print("(HOG finished)")
@@ -204,7 +209,7 @@ def individual_test(x_testing, y_testing):
         image_flat = x_testing[img_num, :]
         image = np.array(image_flat).reshape(32, 32, 3)
         hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+                           cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK))
         
         # note that we are removing the borders of the pic (so its the center 24x24)
         # add the color_feature
@@ -226,6 +231,7 @@ def individual_test(x_testing, y_testing):
 
         print(f"prediction: {model.predict(feature_vector)[0]}")
         print(f"actual: {y_testing[img_num]}")
+        print(f"prediction probs: {model.predict_proba(feature_vector)[0]}")
 
         plt.imshow(image)
         plt.show()
@@ -234,7 +240,7 @@ def individual_test(x_testing, y_testing):
 def visual_all_test(x_testing, y_testing):
     model = load_svm_model()
 
-    images = np.array(x_testing).reshape(246,32,32,3)
+    images = np.array(x_testing).reshap(141,32,32,3)
 
     # Define the number of rows and columns for subplots
     num_rows, num_cols = 7, 8  # Assuming you want 7 rows and 8 columns of images
@@ -250,7 +256,7 @@ def visual_all_test(x_testing, y_testing):
 
                 image = images[i*8 + j, :]
                 hog_features = hog(image, orientations=ORIENTATIONS, pixels_per_cell=(PIXELS_PER_CELL, PIXELS_PER_CELL),
-                                   cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK), channel_axis=-1)
+                                   cells_per_block=(CELLS_PER_BLOCK, CELLS_PER_BLOCK))
 
                 title = f"prediction: {model.predict(np.array(hog_features).reshape(1, -1))[0]} " \
                         f"actual: {y_testing[i*8 + j]}"
